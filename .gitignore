@@ -12,6 +12,5 @@ htmlcov/
 data/
 logs/
 
-# Vendor SDK and local notes (not part of the project)
-2018-7-23 K720 SDK-Eng/
+# Local notes (not part of the project)
 promp
