@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Runtime data
+data/
+logs/
+
+# Vendor SDK and local notes (not part of the project)
+2018-7-23 K720 SDK-Eng/
+promp

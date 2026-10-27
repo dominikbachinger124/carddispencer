@@ -148,7 +148,7 @@ def build_frame(address: int, payload: bytes) -> bytes:
     """Build a command frame for the K720 protocol.
 
     Args:
-        address: Device address (0x0000-0xFFFF) set by DIP switch.
+        address: Device address, 0-15 (DIP switch; sent as ASCII digits ADDH ADDL).
         payload: Command bytes, e.g. b"AP" or b"\\x3B\\x31".
 
     Returns:
@@ -228,10 +228,10 @@ from card_dispenser.device.protocol import build_frame
 def test_build_frame_ap_command_has_correct_bcc() -> None:
     frame = build_frame(address=0x0000, payload=b"AP")
 
-    assert frame[0] == 0x02          # STX
-    assert frame[-2] == 0x03         # ETX
+    assert frame[0] == 0x02  # STX
+    assert frame[-2] == 0x03  # ETX
     bcc = 0
-    for byte in frame[:-1]:          # XOR from STX through ETX
+    for byte in frame[:-1]:  # XOR from STX through ETX
         bcc ^= byte
     assert frame[-1] == bcc
 ```
@@ -254,7 +254,7 @@ Frame format (command):
 | Byte(s)      | Meaning                                              |
 |--------------|------------------------------------------------------|
 | `0x02`       | STX                                                  |
-| ADDH, ADDL   | Device address (ASCII digits per DIP switch table)   |
+| ADDH, ADDL   | Device address as ASCII digits "00"-"15" (DIP switch table) |
 | LEN_H, LEN_L | Payload length, big endian                           |
 | payload      | Command code and parameters                          |
 | `0x03`       | ETX                                                  |
@@ -301,7 +301,9 @@ Backend service pattern (dispense flow):
 class DispenseService:
     """Dispense one card and register its UID."""
 
-    def __init__(self, dispenser: K720, cards: CardRepository, clock: Callable[[], datetime]) -> None:
+    def __init__(
+        self, dispenser: K720, cards: CardRepository, clock: Callable[[], datetime]
+    ) -> None:
         self._dispenser = dispenser
         self._cards = cards
         self._clock = clock
@@ -331,8 +333,8 @@ Frontend (Qt) pattern - worker thread, signals, no blocking in the UI:
 class DispenseWorker(QObject):
     """Runs the dispense flow off the UI thread."""
 
-    finished = Signal(object)   # Card
-    failed = Signal(str)        # user-facing message
+    finished = Signal(object)  # Card
+    failed = Signal(str)  # user-facing message
 
     def __init__(self, service: DispenseService) -> None:
         super().__init__()
